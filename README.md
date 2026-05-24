@@ -2,7 +2,7 @@
 
 PlatformOps is a lightweight internal developer platform for deploying, observing, and managing containerized backend services on a local Kubernetes cluster.
 
-The Phase 1 goal is intentionally small: establish the repository structure, a runnable Go backend skeleton, and local automation for a Kind-based Kubernetes environment.
+Currently i've established the repository structure, a runnable Go backend skeleton, and local automation for a Kind-based Kubernetes environment.
 
 ## Current Status
 
