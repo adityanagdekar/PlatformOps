@@ -1,0 +1,18 @@
+.DS_Store
+
+# Go
+bin/
+coverage.out
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Editor
+.idea/
+.vscode/
+
