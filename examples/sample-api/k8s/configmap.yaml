@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-api-config
+  namespace: platformops
+  labels:
+    app.kubernetes.io/name: sample-api
+    app.kubernetes.io/part-of: platformops
+data:
+  APP_ENV: local
+  READY: "true"

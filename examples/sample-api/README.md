@@ -23,10 +23,32 @@ curl http://localhost:8080/ready
 curl http://localhost:8080/metrics
 ```
 
-Planned runtime assets for the rest of Phase 2:
+Container build:
 
-- `Dockerfile`
-- Kubernetes `Deployment`
-- Kubernetes `Service`
-- Kubernetes `ConfigMap`
-- readiness and liveness probes
+```sh
+docker build -t sample-api:local ./examples/sample-api
+```
+
+Deploy to Kind from the repository root:
+
+```sh
+make cluster-up
+make deploy-sample
+```
+
+Inspect the deployment:
+
+```sh
+kubectl get pods -n platformops
+kubectl get svc -n platformops
+kubectl rollout status deployment/sample-api -n platformops
+```
+
+Port-forward and verify:
+
+```sh
+kubectl port-forward svc/sample-api -n platformops 8081:80
+curl http://localhost:8081/health
+curl http://localhost:8081/ready
+curl http://localhost:8081/metrics
+```

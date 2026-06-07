@@ -2,7 +2,7 @@
 
 PlatformOps is a lightweight internal developer platform for deploying, observing, and managing containerized backend services on a local Kubernetes cluster.
 
-Currently i've established the repository structure, a runnable Go backend skeleton, and local automation for a Kind-based Kubernetes environment.
+Currently the project has a runnable Go backend skeleton, local automation for a Kind-based Kubernetes environment, and a manually deployable sample API.
 
 ## Current Status
 
@@ -16,6 +16,14 @@ Implemented in Phase 1:
 - Placeholder sample deployment command
 - Starter sample deployment config
 - Initial CI workflow for backend tests/build
+
+Implemented in Phase 2:
+
+- Sample Go backend service with `GET /health`, `GET /ready`, and `GET /metrics`
+- Dockerfile for the sample service
+- Kubernetes Namespace, ConfigMap, Deployment, and Service manifests
+- Readiness and liveness probes
+- Local Kind deployment script for the sample service
 
 Not implemented yet:
 
@@ -54,11 +62,13 @@ make cluster-up
 make backend-run
 make backend-test
 make backend-docker-build
+make sample-docker-build
 make deploy-sample
+make undeploy-sample
 make cluster-down
 ```
 
-`make deploy-sample` and `make monitoring-up` exist as placeholders for later phases.
+`make monitoring-up` exists as a placeholder for the later monitoring phase.
 
 ## Backend
 
@@ -72,4 +82,46 @@ Health check:
 
 ```sh
 curl http://localhost:8080/health
+```
+
+## Sample API
+
+Build the sample image:
+
+```sh
+make sample-docker-build
+```
+
+Deploy it to the local Kind cluster:
+
+```sh
+make cluster-up
+make deploy-sample
+```
+
+Inspect Kubernetes resources:
+
+```sh
+kubectl get pods -n platformops
+kubectl get svc -n platformops
+```
+
+Port-forward the sample service:
+
+```sh
+kubectl port-forward svc/sample-api -n platformops 8081:80
+```
+
+Verify the service from another terminal:
+
+```sh
+curl http://localhost:8081/health
+curl http://localhost:8081/ready
+curl http://localhost:8081/metrics
+```
+
+Remove sample app resources:
+
+```sh
+make undeploy-sample
 ```
