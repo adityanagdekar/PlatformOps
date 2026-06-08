@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type healthResponse struct {
@@ -14,14 +15,18 @@ type healthResponse struct {
 	Timestamp string `json:"timestamp"`
 }
 
+type notImplementedResponse struct {
+	Error   string `json:"error"`
+	Message string `json:"message"`
+}
+
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /health", healthHandler)
+	router := setupRouter()
 
 	addr := ":" + envOrDefault("PORT", "8080")
 	server := &http.Server{
 		Addr:              addr,
-		Handler:           mux,
+		Handler:           router,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
@@ -31,21 +36,51 @@ func main() {
 	}
 }
 
-func healthHandler(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, healthResponse{
+func setupRouter() *gin.Engine {
+	router := gin.New()
+	router.Use(gin.Logger(), gin.Recovery())
+
+	router.GET("/health", healthHandler)
+	router.POST("/deploy", deployHandler)
+	router.GET("/services", servicesHandler)
+	router.GET("/deployments", deploymentsHandler)
+	router.POST("/rollback", rollbackHandler)
+
+	return router
+}
+
+func healthHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, healthResponse{
 		Service:   "platformops-backend",
 		Status:    "ok",
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 	})
 }
 
-func writeJSON(w http.ResponseWriter, status int, payload any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
+func deployHandler(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, notImplementedResponse{
+		Error:   "not_implemented",
+		Message: "deployment config loading and Kubernetes apply logic starts next in Phase 3",
+	})
+}
 
-	if err := json.NewEncoder(w).Encode(payload); err != nil {
-		log.Printf("failed to write json response: %v", err)
-	}
+func servicesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"services": []string{},
+	})
+}
+
+func deploymentsHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"deployments": []string{},
+	})
+}
+
+func rollbackHandler(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, notImplementedResponse{
+		Error:   "not_implemented",
+		Message: "rollback metadata and image restore logic starts after deployment metadata exists",
+	})
 }
 
 func envOrDefault(key, fallback string) string {
@@ -56,4 +91,3 @@ func envOrDefault(key, fallback string) string {
 
 	return value
 }
-
